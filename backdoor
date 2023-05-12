@@ -1,0 +1,52 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.io.File;
+
+public class JavaServer {
+
+    public static void main(String[] args) throws IOException{
+
+        ServerSocket server=new ServerSocket(2000);
+
+        System.out.println("Listening!!!");
+        Socket client=server.accept();
+
+        System.out.println("Client connected!!" );
+
+        InputStream in=client.getInputStream();
+        OutputStream out=client.getOutputStream();
+
+        out.write("Command Prompt\n".getBytes());
+        
+        while(true) {
+            String curdir = System.getProperty("user.dir");
+            out.write((curdir + " % ").getBytes());
+          
+            InputStreamReader inreader=new InputStreamReader(in);
+            BufferedReader reader = new BufferedReader(inreader);
+
+            String input = reader.readLine();
+            
+            if (input.equals("cd")){
+                
+                out.write(curdir.getBytes());
+                
+            }
+            else if (input.equals("dir")){
+                File dir = new File(System.getProperty("user.dir"));
+                File[] files = dir.listFiles();
+                out.write((dir.getPath() + "\n").getBytes());
+                for (File f : files){
+                    String checker = f.isDirectory()?"directory":"file";
+                    out.write((f.getName() + " - " + checker + "\n").getBytes());
+                }
+            }
+            }
+        }
+    }
+
